@@ -51,7 +51,7 @@ public class sistema extends javax.swing.JFrame {
         cbxEstatus = new javax.swing.JComboBox<>();
         btnAgregar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnActualizar = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         txtNombre = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -101,7 +101,12 @@ public class sistema extends javax.swing.JFrame {
 
         btnEliminar.setText("Eliminar");
 
-        jButton3.setText("Actualizar");
+        btnActualizar.setText("Actualizar");
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Mostrar");
 
@@ -121,7 +126,7 @@ public class sistema extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEliminar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
+                        .addComponent(btnActualizar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton4))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -167,11 +172,12 @@ public class sistema extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAgregar)
                     .addComponent(btnEliminar)
-                    .addComponent(jButton3)
+                    .addComponent(btnActualizar)
                     .addComponent(jButton4))
                 .addContainerGap(170, Short.MAX_VALUE))
         );
 
+        tblAlumnos.setFont(new java.awt.Font("Century Gothic", 0, 16)); // NOI18N
         tblAlumnos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -205,12 +211,11 @@ public class sistema extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(39, 39, 39)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -241,8 +246,13 @@ public class sistema extends javax.swing.JFrame {
         txtApellido.setText(tblAlumnos.getValueAt(seleccionFila,2).toString());
         cbxMateria.setSelectedItem(tblAlumnos.getValueAt(seleccionFila, 3));
         txtCalificacion.setText(tblAlumnos.getValueAt(seleccionFila, 4).toString());
-        cbxEstatus.setSelectedItem(tblAlumnos.getValueAt(seleccionFila, 5));
+        cbxEstatus.setSelectedItem(cbxEstatus.getSelectedItem());
     }//GEN-LAST:event_tblAlumnosMouseClicked
+
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+        actualizarDatos();
+        mostrarDatos();
+    }//GEN-LAST:event_btnActualizarActionPerformed
     public void limpiarCampos(){
         txtNombre.setText("");
         txtApellido.setText("");
@@ -275,6 +285,41 @@ public class sistema extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Error al cargar datos en la tabla "+e);
         }
       
+    }
+    
+   private void actualizarDatos(){
+        try{
+            String SQL="UPDATE alumnos SET nombre=?, SET apellido=?, SET materia=?, calificacion=?, estatus=? WHERE id_alumno=?;";
+            
+            int filaSeleccionada=tblAlumnos.getSelectedRow();
+            String dao = (String) tblAlumnos.getValueAt(filaSeleccionada,0);
+            
+            PreparedStatement pst=con.prepareStatement(SQL);
+            
+            pst.setString(1, txtNombre.getText());
+            pst.setString(2, txtApellido.getText());
+            
+            int seleccionMateria = cbxMateria.getSelectedIndex();
+            pst.setString(3, cbxMateria.getItemAt(seleccionMateria));
+            
+            pst.setDouble(4, Double.parseDouble(txtCalificacion.getText()));
+           
+            int seleccionEstatus = cbxEstatus.getSelectedIndex();
+            System.out.println(seleccionEstatus);
+            if (seleccionEstatus == 0){
+                seleccionEstatus = 1;
+            }else{
+                seleccionEstatus = 0;
+            }
+            pst.setInt(5, seleccionEstatus);
+            pst.setString(6, dao);
+            pst.execute();
+            
+            JOptionPane.showMessageDialog(null, "Registro modificado con exito");
+             
+        }catch(Exception ex){
+            JOptionPane.showConfirmDialog(null, "Error al intentar modificar el registro "+ex.getMessage());
+        }
     }
     private void insertarDatos(){
         try{
@@ -342,11 +387,11 @@ public class sistema extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JComboBox<String> cbxEstatus;
     private javax.swing.JComboBox<String> cbxMateria;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
